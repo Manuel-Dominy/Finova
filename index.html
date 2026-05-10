@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="icon" href="data:,">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finova Insight Explorer - Professional Stock Screener</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>Finova Insight Explorer</h1>
+                    <p class="tagline">Professional Stock Analysis Platform</p>
+                </div>
+                <div class="header-right">
+                    <span class="status-indicator" id="statusIndicator">
+                        <span class="status-dot"></span>
+                        Ready
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <!-- Search Section -->
+            <section class="search-section">
+                <div class="search-card">
+                    <h2>Analyze Any Stock</h2>
+                    <p>Enter company name or NSE ticker to get comprehensive financial analysis</p>
+                    
+                    <div class="search-box">
+                        <input 
+                            type="text" 
+                            id="companySearch" 
+                            placeholder="e.g., TCS, Reliance, Infosys, HDFC Bank"
+                            class="search-input"
+                        >
+                        <button id="analyzeBtn" class="analyze-btn">
+                            <span class="btn-text">Analyze</span>
+                            <span class="btn-loader" style="display: none;">Analyzing...</span>
+                        </button>
+                    </div>
+                    
+                    <div id="errorMessage" class="error-message" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- Empty State -->
+            <section id="emptyState" class="empty-state">
+                <div class="empty-content">
+                    <div class="empty-icon">📊</div>
+                    <h3>No Company Selected</h3>
+                    <p>Enter a company name above to start your analysis</p>
+                </div>
+            </section>
+
+            <!-- Dashboard (Hidden Initially) -->
+            <section id="dashboard" class="dashboard" style="display: none;">
+                <!-- Company Header -->
+                <div class="company-header">
+                    <div class="company-info">
+                        <h2 id="companyName">Company Name</h2>
+                        <div class="company-meta">
+                            <span class="ticker" id="ticker">NSE: TICKER</span>
+                            <span class="separator">•</span>
+                            <span class="sector" id="sector">Sector</span>
+                            <span class="separator">•</span>
+                            <span class="market-cap" id="marketCap">Market Cap</span>
+                        </div>
+                    </div>
+                    <div class="price-info">
+                        <div class="current-price" id="currentPrice">₹0</div>
+                        <div class="price-label">Current Price</div>
+                    </div>
+                </div>
+
+                <!-- Overall Score Banner -->
+                <div class="score-banner">
+                    <div class="score-circle">
+                        <div class="score-value" id="overallScore">0</div>
+                        <div class="score-label">Intrinsic Value</div>
+                    </div>
+                    <div class="score-details">
+                        <h3>Investment Verdict</h3>
+                        <p id="verdictText">Analyzing company performance...</p>
+                        <div class="score-breakdown">
+                            <div class="score-item">
+                                <span class="score-label">ROI</span>
+                                <span class="score-value" id="scoreF">0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-label">Growth </span>
+                                <span class="score-value" id="scoreG">0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-label">Sentiment</span>
+                                <span class="score-value" id="scoreS">0</span>
+                            </div>
+                            <div class="score-item">
+                                <span class="score-label">Management</span>
+                                <span class="score-value" id="scoreM">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs -->
+                <nav class="tabs-nav">
+                    <button class="tab-btn active" data-tab="overview">Overview</button>
+                    <button class="tab-btn" data-tab="fundamentals">Fundamentals</button>
+                    <button class="tab-btn" data-tab="growth">Growth</button>
+                    <button class="tab-btn" data-tab="intrinsic">Intrinsic Value</button>
+                    <button class="tab-btn" data-tab="sentiment">Sentiment</button>
+                    <button class="tab-btn" data-tab="management">Management</button>
+                    <button class="tab-btn" data-tab="charts">Charts</button>
+                    <button class="tab-btn" data-tab="news">News</button>
+                </nav>
+
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-pane active">
+                        <div class="overview-grid">
+                            <div class="overview-card">
+                                <h4>Company Information</h4>
+                                <div class="metrics-grid">
+                                    <div class="metric">
+                                        <span class="metric-label">Company</span>
+                                        <span class="metric-value" id="overviewCompany">—</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Sector</span>
+                                        <span class="metric-value" id="overviewSector">—</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Current Price</span>
+                                        <span class="metric-value" id="overviewPrice">—</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Year Analyzed</span>
+                                        <span class="metric-value" id="overviewYear">—</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="overview-card">
+                                <h4>Overall Performance</h4>
+                                <div class="metrics-grid">
+                                    <div class="metric">
+                                        <span class="metric-label">Revenue Growth</span>
+                                        <span class="metric-value" id="overviewRevenueGrowth">—</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Profit Growth</span>
+                                        <span class="metric-value" id="overviewProfitGrowth">—</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Market Sentiment</span>
+                                        <span class="metric-value" id="overviewSentiment">—</span>
+                                    </div>
+                                    <div class="metric">
+                                        <span class="metric-label">Management Score</span>
+                                        <span class="metric-value" id="overviewManagement">—</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="overview-card">
+                                <h4>Summary</h4>
+                                <p id="overviewSummary">Loading company analysis...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fundamentals Tab -->
+                    <div id="fundamentals" class="tab-pane">
+                        <div class="fundamentals-grid">
+                            <div class="fundamentals-card">
+                                <h4>Profitability & Revenue</h4>
+                                <div class="metric-list">
+                                    <div class="metric-row">
+                                        <span>Return on Equity (ROE)</span>
+                                        <span id="roe">0%</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Return on Capital Employed (ROCE)</span>
+                                        <span id="roce">0%</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Total Revenue</span>
+                                        <span id="totalRevenue">₹0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Net Income</span>
+                                        <span id="netIncome">₹0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>EBIT</span>
+                                        <span id="ebit">₹0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Operating Cash Flow (OCF)</span>
+                                        <span id="ocf">₹0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Free Cash Flow (FCF)</span>
+                                        <span id="fcf">₹0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Tax Rate</span>
+                                        <span id="taxRate">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="fundamentals-card">
+                                <h4>Financial Health</h4>
+                                <div class="metric-list">
+                                    <div class="metric-row">
+                                        <span>Debt to Equity</span>
+                                        <span id="debtToEquity">0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Total Debt</span>
+                                        <span id="totalDebt">₹0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Capital Expenditure (Capex)</span>
+                                        <span id="capex">₹0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Depreciation & Amortization (D&A)</span>
+                                        <span id="da">₹0</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Shares Outstanding</span>
+                                        <span id="shares">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Growth Tab -->
+                    <div id="growth" class="tab-pane">
+                        <div class="growth-grid">
+                            <div class="growth-card">
+                                <h4>Revenue Growth</h4>
+                                <div class="metric-list">
+                                    <div class="metric-row">
+                                        <span>Revenue YoY Growth %</span>
+                                        <span id="revenueYoYGrowth">0%</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>CAGR Revenue</span>
+                                        <span id="cagrRevenue">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="growth-card">
+                                <h4>Profit Growth</h4>
+                                <div class="metric-list">
+                                    <div class="metric-row">
+                                        <span>Profit YoY Growth %</span>
+                                        <span id="profitYoYGrowth">0%</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Operating Margin</span>
+                                        <span id="cagrNetIncome">0%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="growth-card">
+                                <h4>Company Information</h4>
+                                <div class="metric-list">
+                                    <div class="metric-row">
+                                        <span>Year Analyzed</span>
+                                        <span id="yearAnalyzed">2025</span>
+                                    </div>
+                                    <div class="metric-row">
+                                        <span>Date Ending</span>
+                                        <span id="dateEnding">—</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Intrinsic Value Tab -->
+                    <div id="intrinsic" class="tab-pane">
+                        <div class="intrinsic-card">
+                            <h4>Valuation Analysis</h4>
+                            <div class="valuation-grid">
+                                <div class="valuation-item">
+                                    <span class="valuation-label">Intrinsic Value</span>
+                                    <span class="valuation-value" id="intrinsicValue">₹0</span>
+                                </div>
+                                <div class="valuation-item">
+                                    <span class="valuation-label">Market Price</span>
+                                    <span class="valuation-value" id="marketPrice">₹0</span>
+                                </div>
+                                <div class="valuation-item">
+                                    <span class="valuation-label">Operating Margin</span>
+                                    <span class="valuation-value" id="marginOfSafety">0%</span>
+                                </div>
+                                <div class="valuation-item">
+                                    <span class="valuation-label">Valuation Status</span>
+                                    <span class="valuation-badge" id="valuationStatus">Fairly Valued</span>
+                                </div>
+                                <div class="valuation-item">
+                                    <span class="valuation-label">Over/Under</span>
+                                    <span class="valuation-value" id="overUnder">—</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+        <!-- Premium Sentiment Tab -->
+<div id="sentiment" class="tab-pane">
+    <div class="overview-grid">
+        <!-- Main Sentiment Card -->
+        <div class="overview-card">
+            <h4>Market Sentiment</h4>
+            <div class="metrics-grid">
+                <div class="metric">
+                    <span class="metric-label">Sentiment Score</span>
+                    <span class="metric-value" id="sentimentGaugeValue">0.00</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Sentiment Status</span>
+                    <span class="metric-value" id="sentimentStatus">Neutral</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Sentiment Badge</span>
+                    <span class="metric-value" id="sentimentBadgeLarge">Neutral</span>
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="progress-bar-premium">
+                <div class="progress-track">
+                    <div class="progress-fill" id="sentimentGaugeFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interpretation -->
+        <div class="overview-card">
+            <h4>Interpretation</h4>
+            <p id="sentimentInterpretation">
+                Market shows balanced sentiment with stable outlook
+            </p>
+        </div>
+
+        <!-- Factors -->
+        <div class="overview-card">
+            <h4>Key Market Factors</h4>
+            <ul class="factors-list">
+                <li><b>Positive:</b> Strong earnings, favorable analyst outlook</li>
+                <li><b>Negative:</b> Regulatory risks, market volatility</li>
+                <li><b>Neutral:</b> Stable liquidity and moderate volume</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<!-- Unified Management Tab (Single Card Layout) -->
+<div id="management" class="tab-pane">
+    <div class="management-card">
+        <h4>Management Quality Assessment</h4>
+
+        <!-- Overall Score -->
+        <div class="metrics-grid" style="margin-bottom:20px;">
+            <div class="metric">
+                <span class="metric-label">Overall Score</span>
+                <span class="metric-value" id="managementScoreLarge">0.0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Performance Level</span>
+                <span class="metric-value" id="performanceLevel">Assessing...</span>
+            </div>
+        </div>
+
+        <p id="managementSummaryText" style="margin-bottom:25px;">
+            Analyzing management capabilities...
+        </p>
+
+        <!-- Breakdown List -->
+        <div class="metric-list">
+            <div class="management-item">
+                <div class="management-header">
+                    <span class="management-title">Leadership</span>
+                    <span class="management-score" id="leadershipScore">0.0/10</span>
+                </div>
+                <div class="progress-bar-premium">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="leadershipBarFill"></div>
+                    </div>
+                </div>
+                <div class="management-reason" id="leadershipReason"></div>
+            </div>
+
+            <div class="management-item">
+                <div class="management-header">
+                    <span class="management-title">Capital Allocation</span>
+                    <span class="management-score" id="capitalAllocationScore">0.0/10</span>
+                </div>
+                <div class="progress-bar-premium">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="capitalAllocationBarFill"></div>
+                    </div>
+                </div>
+                <div class="management-reason" id="capitalAllocationReason"></div>
+            </div>
+
+            <div class="management-item">
+                <div class="management-header">
+                    <span class="management-title">Governance</span>
+                    <span class="management-score" id="governanceScore">0.0/10</span>
+                </div>
+                <div class="progress-bar-premium">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="governanceBarFill"></div>
+                    </div>
+                </div>
+                <div class="management-reason" id="governanceReason"></div>
+            </div>
+
+            <div class="management-item">
+                <div class="management-header">
+                    <span class="management-title">Communication</span>
+                    <span class="management-score" id="communicationScore">0.0/10</span>
+                </div>
+                <div class="progress-bar-premium">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="communicationBarFill"></div>
+                    </div>
+                </div>
+                <div class="management-reason" id="communicationReason"></div>
+            </div>
+
+            <div class="management-item">
+                <div class="management-header">
+                    <span class="management-title">Stability</span>
+                    <span class="management-score" id="stabilityScore">0.0/10</span>
+                </div>
+                <div class="progress-bar-premium">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="stabilityBarFill"></div>
+                    </div>
+                </div>
+                <div class="management-reason" id="stabilityReason"></div>
+            </div>
+
+            <div class="management-item">
+                <div class="management-header">
+                    <span class="management-title">Market Trust</span>
+                    <span class="management-score" id="marketTrustScore">0.0/10</span>
+                </div>
+                <div class="progress-bar-premium">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="marketTrustBarFill"></div>
+                    </div>
+                </div>
+                <div class="management-reason" id="marketTrustReason"></div>
+            </div>
+        </div>
+    </div>
+</div>
+                    <!-- Charts Tab -->
+                    <div id="charts" class="tab-pane">
+                        <div class="charts-grid">
+                            <div class="chart-container">
+                                <h4>share price</h4>
+                                <canvas id="sharechart"></canvas>
+                            </div>
+                            <div class="chart-container">
+                                <h4>Revenue Growth</h4>
+                                <canvas id="revenueChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- News Tab -->
+    <div id="news" class="tab-pane">
+        <div class="overview-grid">
+            <div class="overview-card">
+                <h4>Latest Company News</h4>
+                <div class="metric-list" id="newsContainer">
+                    <div class="metric-row">
+                        <span>Loading latest news...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Finova Insight Explorer. Professional stock analysis platform.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
